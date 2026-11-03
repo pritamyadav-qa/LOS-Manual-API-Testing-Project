@@ -1,0 +1,143 @@
+{
+  "info": {
+    "name": "Fictional LOS API Testing",
+    "description": "Practice collection for a fictional Loan Origination System. Configure baseUrl and token for an authorized test/mock API. No live banking API is included.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://your-authorized-test-api.example.com"
+    },
+    {
+      "key": "token",
+      "value": "replace-with-your-test-token"
+    },
+    {
+      "key": "applicationId",
+      "value": "replace-with-existing-test-application-id"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Application",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "applications"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicant\": {\n    \"fullName\": \"Aarav Shah\",\n    \"dateOfBirth\": \"1995-04-12\",\n    \"mobile\": \"9876543210\",\n    \"pan\": \"ABCDE1234F\"\n  },\n  \"employment\": {\n    \"type\": \"SALARIED\",\n    \"monthlyIncome\": 55000\n  },\n  \"loan\": {\n    \"product\": \"PERSONAL_LOAN\",\n    \"requestedAmount\": 500000,\n    \"tenureMonths\": 36\n  },\n  \"documents\": [\n    \"PAN\",\n    \"ADDRESS_PROOF\"\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Response is created or accepted', function () { pm.expect([201, 202]).to.include(pm.response.code); });",
+              "pm.test('Response is JSON when a body is returned', function () { if (pm.response.text()) pm.expect(pm.response.headers.get('Content-Type') || '').to.include('application/json'); });",
+              "if (pm.response.code === 201 || pm.response.code === 202) {",
+              "  const body = pm.response.json();",
+              "  if (body.applicationId) pm.collectionVariables.set('applicationId', body.applicationId);",
+              "  pm.test('Application ID is returned', function () { pm.expect(body.applicationId).to.be.ok; });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Application",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/applications/{{applicationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "applications",
+            "{{applicationId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Application lookup returns 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response time is under 3000 ms (portfolio observation)', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+              "pm.test('Application ID matches requested ID', function () { const body = pm.response.json(); pm.expect(String(body.applicationId)).to.eql(String(pm.collectionVariables.get('applicationId'))); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update Application Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/applications/{{applicationId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "applications",
+            "{{applicationId}}",
+            "status"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"UNDER_REVIEW\",\n  \"reason\": \"Started review for portfolio test\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status update returns success', function () { pm.expect([200, 204]).to.include(pm.response.code); });",
+              "if (pm.response.code === 200) { pm.test('Updated status is UNDER_REVIEW', function () { pm.expect(pm.response.json().status).to.eql('UNDER_REVIEW'); }); }"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

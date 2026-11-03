@@ -1,0 +1,21 @@
+Test Case ID,Scenario ID,Module,Preconditions,Test Steps,Test Data,Expected Result,Actual Result,Status,Priority
+TC-001,TS-001,Applicant Onboarding,Application form is available,"Enter valid name, DOB, mobile, PAN and address; click Continue","Name: Aarav Shah; age: 30; mobile: 9876543210","Applicant details are accepted and next step is displayed",,Not Run,High
+TC-002,TS-002,Applicant Onboarding,Application form is available,"Leave applicant name blank; complete other fields; submit","Name: blank","Inline mandatory-field validation is displayed and submission is blocked",,Not Run,High
+TC-003,TS-003,Applicant Onboarding,Application form is available,"Enter mobile number with 9 digits; submit","987654321","System rejects the mobile number and displays a validation message",,Not Run,High
+TC-004,TS-004,Applicant Onboarding,Application form is available,"Enter DOB resulting in applicant age below 21; continue","Age: 20","System blocks progression and displays age eligibility message",,Not Run,High
+TC-005,TS-005,Income Details,Applicant details completed,"Enter monthly income below minimum; continue","Monthly income: 24000","System flags income as below the fictional minimum threshold",,Not Run,High
+TC-006,TS-006,Loan Details,Applicant eligible for next step,"Enter minimum permitted loan amount; continue","Amount: 50000","Amount is accepted",,Not Run,High
+TC-007,TS-007,Loan Details,Applicant eligible for next step,"Enter maximum permitted loan amount; continue","Amount: 2000000","Amount is accepted",,Not Run,High
+TC-008,TS-008,Loan Details,Applicant eligible for next step,"Enter amount above maximum; continue","Amount: 2000001","System rejects the amount with a validation message",,Not Run,High
+TC-009,TS-009,Documents,Applicant has completed form,"Do not upload address proof; submit application","PAN: uploaded; address proof: missing","Submission is blocked and missing document is identified",,Not Run,High
+TC-010,TS-010,Submission,All required data and documents are valid,"Submit application; capture generated ID","Valid fictional applicant","Unique application ID is generated and status is SUBMITTED",,Not Run,High
+TC-011,TS-011,Application Review,Application status is SUBMITTED,"Reviewer opens application and selects Start Review","Application ID from TC-010","Status changes to UNDER_REVIEW",,Not Run,Medium
+TC-012,TS-012,Decision,Application status is UNDER_REVIEW and meets exercise rules,"Reviewer selects Approve and enters reason","Reason: Eligibility checks passed","Status changes to APPROVED and decision is recorded",,Not Run,High
+TC-013,TS-013,Decision,Application status is UNDER_REVIEW,"Reviewer selects Reject and enters reason","Reason: Supporting information insufficient","Status changes to REJECTED and reason is recorded",,Not Run,Medium
+TC-014,TS-014,Disbursement,Application is not APPROVED,"Attempt to mark a SUBMITTED application as DISBURSED","Status: SUBMITTED","System prevents disbursement and returns a clear validation error",,Not Run,High
+TC-015,TS-015,Status,Application exists in a valid state,"Attempt an unsupported status transition","SUBMITTED → DISBURSED","System rejects invalid transition; status remains unchanged",,Not Run,High
+TC-016,TS-016,API,Valid application exists,"Send GET /applications/{applicationId}; inspect status and body","Existing application ID","200 response; response ID and status match stored application",,Not Run,High
+TC-017,TS-017,API,API is available,"Send GET using unknown application ID","applicationId: 99999999","404 response with safe, useful error message",,Not Run,Medium
+TC-018,TS-018,Database,Application submitted successfully,"Query application table using generated ID","Generated application ID","Exactly one row exists and status is SUBMITTED",,Not Run,High
+TC-019,TS-019,Database,Application submitted successfully,"Attempt duplicate insert using same unique application ID","Existing application ID","Database rejects duplicate ID or application service prevents duplicate creation",,Not Run,High
+TC-020,TS-020,Regression,New build deployed to test environment,"Re-execute critical onboarding-to-submission test cases","Valid applicant data","Previously working core journey still behaves as expected",,Not Run,High

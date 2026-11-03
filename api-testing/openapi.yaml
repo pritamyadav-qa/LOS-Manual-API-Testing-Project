@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: Fictional LOS API
+  version: 1.0.0
+  description: Proposed API contract for a self-directed QA practice project. Not a live bank API.
+servers:
+  - url: https://your-authorized-test-api.example.com
+paths:
+  /applications:
+    post:
+      summary: Create a loan application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApplicationRequest'
+      responses:
+        '201':
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Validation error
+  /applications/{applicationId}:
+    get:
+      summary: Retrieve an application
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '404':
+          description: Application not found
+  /applications/{applicationId}/status:
+    patch:
+      summary: Update application status
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, reason]
+              properties:
+                status:
+                  type: string
+                  enum: [UNDER_REVIEW, APPROVED, REJECTED, DISBURSED]
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Status updated
+        '400':
+          description: Invalid transition
+        '404':
+          description: Application not found
+components:
+  schemas:
+    CreateApplicationRequest:
+      type: object
+      required: [applicant, employment, loan, documents]
+      properties:
+        applicant:
+          type: object
+          required: [fullName, dateOfBirth, mobile, pan]
+          properties:
+            fullName: {type: string}
+            dateOfBirth: {type: string, format: date}
+            mobile: {type: string, pattern: '^[0-9]{10}$'}
+            pan: {type: string}
+        employment:
+          type: object
+          required: [type, monthlyIncome]
+          properties:
+            type: {type: string, enum: [SALARIED, SELF_EMPLOYED]}
+            monthlyIncome: {type: number, minimum: 0}
+        loan:
+          type: object
+          required: [product, requestedAmount, tenureMonths]
+          properties:
+            product: {type: string}
+            requestedAmount: {type: number, minimum: 50000, maximum: 2000000}
+            tenureMonths: {type: integer, minimum: 1}
+        documents:
+          type: array
+          items: {type: string}
+    Application:
+      type: object
+      properties:
+        applicationId: {type: string}
+        status:
+          type: string
+          enum: [SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED, DISBURSED]

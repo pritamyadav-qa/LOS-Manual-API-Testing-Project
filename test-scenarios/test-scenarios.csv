@@ -1,0 +1,21 @@
+Scenario ID,Module,Scenario,Type,Priority
+TS-001,Applicant Onboarding,Verify applicant can enter valid personal details,Positive,High
+TS-002,Applicant Onboarding,Verify mandatory fields cannot be blank,Negative,High
+TS-003,Applicant Onboarding,Verify mobile number accepts exactly 10 digits,Boundary,High
+TS-004,Applicant Onboarding,Verify applicant below 21 years is blocked,Negative,High
+TS-005,Income Details,Verify monthly income below ₹25000 is flagged,Negative,High
+TS-006,Loan Details,Verify minimum loan amount ₹50000 is accepted,Boundary,High
+TS-007,Loan Details,Verify maximum loan amount ₹2000000 is accepted,Boundary,High
+TS-008,Loan Details,Verify amount above ₹2000000 is rejected,Negative,High
+TS-009,Documents,Verify application cannot be submitted without PAN and address proof,Negative,High
+TS-010,Submission,Verify successful submission generates unique application ID,Positive,High
+TS-011,Application Review,Verify submitted application can move to UNDER_REVIEW,Positive,Medium
+TS-012,Decision,Verify reviewer can approve an eligible application,Positive,High
+TS-013,Decision,Verify reviewer can reject an application with a reason,Positive,Medium
+TS-014,Disbursement,Verify only APPROVED application can be disbursed,Negative,High
+TS-015,Status,Verify invalid status transition is prevented,Negative,High
+TS-016,API,Verify GET application returns correct application details,Positive,High
+TS-017,API,Verify unknown application ID returns 404,Negative,Medium
+TS-018,Database,Verify submitted application is persisted with SUBMITTED status,Positive,High
+TS-019,Database,Verify duplicate application IDs are not stored,Negative,High
+TS-020,Regression,Verify previously working application journey after a change,Regression,High
